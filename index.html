@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRX Operational Commands Guide</title>
+    <title>SRX Operational Commands Guide - Updated</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f4f7f6;
@@ -31,10 +31,19 @@
             border-left: 5px solid #e74c3c;
             padding-left: 15px;
             margin-top: 30px;
+            margin-bottom: 5px;
+        }
+        .description {
+            font-size: 0.95em;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: block;
         }
         h3 {
             color: #34495e;
             margin-top: 20px;
+            margin-bottom: 5px;
         }
         .toc {
             background-color: #f9f9f9;
@@ -71,7 +80,7 @@
             display: block;
         }
         .cmd {
-            color: #ff4d4d; /* Bold Red Command */
+            color: #ff4d4d;
             font-weight: bold;
         }
         hr {
@@ -91,226 +100,281 @@
         <h3>TABLE OF CONTENTS</h3>
         <ul>
             <li><a href="#sec1">1. Preparation & Cleanup</a></li>
-            <li><a href="#sec2">2. USB Mounting</a></li>
+            <li><a href="#sec2">2. USB Preparation & Mounting</a></li>
             <li><a href="#sec3">3. Install Firmware from USB</a></li>
-            <li><a href="#sec4">4. Copy to Internal Storage</a></li>
+            <li><a href="#sec4">4. Copy Image to Internal</a></li>
             <li><a href="#sec5">5. Install from Internal Storage</a></li>
-            <li><a href="#sec6">6. Post-Install Verification</a></li>
-            <li><a href="#sec7">7. Bootloader Install / Clean Install</a></li>
+            <li><a href="#sec6">6. Post-Reboot Verification</a></li>
+            <li><a href="#sec7">7. Bootloader Clean Install</a></li>
             <li><a href="#sec8">8. Repartition / Clean Install</a></li>
             <li><a href="#sec9">9. TFTP Install from Loader</a></li>
-            <li><a href="#sec10">10. Mirror Image to Secondary Boot</a></li>
-            <li><a href="#sec11">11. Bootloader U-Boot / Veloader Upgrade</a></li>
+            <li><a href="#sec10">10. Mirror Image to Secondary</a></li>
+            <li><a href="#sec11">11. U-Boot / Veloader Upgrade</a></li>
             <li><a href="#sec12">12. Backup Config to USB</a></li>
             <li><a href="#sec13">13. SRX345 Initial Config</a></li>
-            <li><a href="#sec14">14. Software Upgrade from TFTP</a></li>
+            <li><a href="#sec14">14. Software Upgrade (TFTP)</a></li>
             <li><a href="#sec15">15. Post-Upgrade Verification</a></li>
             <li><a href="#sec16">16. Common Alarms & Fixes</a></li>
-            <li><a href="#sec17">17. Additional Verification Commands</a></li>
-            <li><a href="#sec18">18. Additional Storage Commands</a></li>
-            <li><a href="#sec19">19. Additional Backup & Restore</a></li>
-            <li><a href="#sec20">20. Additional Debug / Logs</a></li>
-            <li><a href="#sec21">21. Additional Interface / Routing</a></li>
+            <li><a href="#sec17">17. Verification/Troubleshooting</a></li>
+            <li><a href="#sec18">18. Storage & Partitions</a></li>
+            <li><a href="#sec19">19. Backup & Restore Commands</a></li>
+            <li><a href="#sec20">20. Debug & Logs</a></li>
+            <li><a href="#sec21">21. Interface & Routing</a></li>
+            <li><a href="#secA1">A1. Internal Config Backup</a></li>
+            <li><a href="#secA2">A2. CLI USB Mounting</a></li>
+            <li><a href="#secA3">A3. Verify USB (CLI)</a></li>
+            <li><a href="#secA4">A4. Copy Config TO USB</a></li>
+            <li><a href="#secA5">A5. Copy Config FROM USB</a></li>
+            <li><a href="#secA6">A6. Explicit Config Mode</a></li>
+            <li><a href="#secA7">A7. Review Changes (Compare)</a></li>
+            <li><a href="#secA8">A8. CLI Backup/Restore Workflow</a></li>
+            <li><a href="#secA9">A9. Offline Backup Process</a></li>
+            <li><a href="#secA10">A10. Enhanced Verification</a></li>
+            <li><a href="#secA11">A11. Persistence Check</a></li>
         </ul>
     </div>
 
     <h2 id="sec1">1) PRE-UPGRADE PREPARATION</h2>
-    <h3>1.1 Verify Current Firmware / Boot Version</h3>
+    <span class="description">Essential steps to check current status and clear space before starting an upgrade.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show system firmware</span>
-    </div>
-    <div class="command-block">
-        <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show version</span>
-    </div>
-
-    <h3>1.2 System Cleanup</h3>
-    <div class="command-block">
-        <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">request system storage cleanup</span>
-    </div>
-
-    <h3>1.3 Reboot System</h3>
-    <div class="command-block">
-        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">show system firmware</span><br>
+        <span class="cmd">show version</span><br>
+        <span class="cmd">request system storage cleanup</span><br>
         <span class="cmd">request system reboot</span>
     </div>
 
     <h2 id="sec2">2) USB PREPARATION & MOUNTING</h2>
-    <h3>2.1 Enter CLI</h3>
-    <div class="command-block"><span class="mode-label">Mode: Operational (>)</span><span class="cmd">cli</span></div>
-    
-    <h3>2.2 Enter Shell Mode</h3>
-    <div class="command-block"><span class="mode-label">Mode: CLI (>)</span><span class="cmd">start shell</span></div>
-
-    <h3>2.3 Create Mount Point</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">mkdir /var/tmp/usb</span></div>
-
-    <h3>2.4 Mount USB</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">mount -t msdosfs /dev/da1s1 /var/tmp/usb</span></div>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">mount -t msdosfs /dev/da1 /mnt</span></div>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">mount -t ext2fs /dev/da1s1 /var/tmp/usb</span></div>
-
-    <h3>2.5 Confirm USB Files</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">ls /var/tmp/usb</span></div>
-
-    <h2 id="sec3">3) INSTALL FIRMWARE FROM USB</h2>
+    <span class="description">Manual mounting via shell to access external storage devices.</span>
     <div class="command-block">
-        <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">request system software add /mnt/junos-install-srxsme-mips-64-24.4R2.21.tgz no-validate reboot</span><br>
-        <span class="cmd">request system software add /var/tmp/usb/junos.tgz no-validate reboot</span><br>
-        <span class="cmd">request system software add /var/tmp/usb/junos-install-srxsme-mips-64-25.2R1.9.tgz partition no-validate reboot</span><br>
-        <span class="cmd">request system software add /var/tmp/jfirmware-srxsme-23.4R2.13-signed.tgz partition no-validate reboot</span>
+        <span class="mode-label">Mode: Shell (%)</span>
+        <span class="cmd">mkdir /var/tmp/usb</span><br>
+        <span class="cmd">mount -t msdosfs /dev/da1s1 /var/tmp/usb</span>
     </div>
 
-    <h2 id="sec4">4) COPY IMAGE FROM USB TO INTERNAL STORAGE</h2>
-    <h3>4.1 Copy Image</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">cp /cf/var/tmp/usb/junos.img /var/tmp/</span></div>
-    
-    <h3>4.2 Verify Copy</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">ls -lh /var/tmp/junos.img</span></div>
+    <h2 id="sec3">3) INSTALL FIRMWARE FROM USB</h2>
+    <span class="description">Commands to initiate the Junos installation directly from a mounted USB drive.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">request system software add /mnt/usb/junos.tgz no-validate reboot</span>
+    </div>
 
-    <h3>4.3 Unmount USB</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">umount /cf/var/tmp/usb</span></div>
+    <h2 id="sec4">4) COPY IMAGE TO INTERNAL STORAGE</h2>
+    <span class="description">Moving the firmware to the device's internal flash for a more stable installation.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Shell (%)</span>
+        <span class="cmd">cp /cf/var/tmp/usb/junos.img /var/tmp/</span>
+    </div>
 
-    <h2 id="sec5">5) INSTALL JUNOS FROM INTERNAL STORAGE</h2>
+    <h2 id="sec5">5) INSTALL FROM INTERNAL STORAGE</h2>
+    <span class="description">Finalizing the software installation using the file stored in /var/tmp/.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
         <span class="cmd">request system software add /var/tmp/junos.img no-validate reboot</span>
     </div>
-    <h3>5.1 Delete Image</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">rm /var/tmp/junos.img</span></div>
 
     <h2 id="sec6">6) POST-REBOOT VERIFICATION</h2>
+    <span class="description">Checking the system status and alarms after an upgrade to ensure stability.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
         <span class="cmd">show version</span><br>
-        <span class="cmd">show system uptime</span><br>
-        <span class="cmd">show system alarms</span><br>
-        <span class="cmd">show chassis hardware</span><br>
-        <span class="cmd">show interfaces terse</span>
+        <span class="cmd">show system alarms</span>
     </div>
 
-    <h2 id="sec7">7) BOOTLOADER INSTALL / CLEAN INSTALL</h2>
+    <h2 id="sec7">7) BOOTLOADER CLEAN INSTALL</h2>
+    <span class="description">Used when the OS is corrupted; installs Junos directly from the loader prompt.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Bootloader (loader>)</span>
-        <span class="cmd">install --format file:///jfirmware-srxsme-mips-64-25.2R1.9.tgz</span><br>
         <span class="cmd">install file:///junos-install-srxsme-mips-64-25.2R1.9.tgz</span>
     </div>
 
     <h2 id="sec8">8) REPARTITION / CLEAN INSTALL</h2>
+    <span class="description">Wipes the disk partitions to ensure a fresh, clean software environment.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">request system software add /var/tmp/usb/junos-install-srxsme-mips-64-25.2R1.9.tgz partition no-validate reboot</span>
+        <span class="cmd">request system software add /var/tmp/usb/junos.tgz partition no-validate reboot</span>
     </div>
 
     <h2 id="sec9">9) TFTP INSTALL FROM LOADER</h2>
+    <span class="description">Emergency recovery via network if local USB ports or files are unavailable.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Bootloader (loader>)</span>
         <span class="cmd">set ipaddr=192.168.1.20</span><br>
-        <span class="cmd">set netmask=255.255.255.0</span><br>
-        <span class="cmd">set serverip=192.168.1.10</span><br>
-        <span class="cmd">install tftp://192.168.1.10/junos-install-srxsme-mips-64-25.2R1.9.tgz</span>
+        <span class="cmd">install tftp://192.168.1.10/junos.tgz</span>
     </div>
 
-    <h2 id="sec10">10) MIRROR IMAGE TO SECONDARY BOOT</h2>
+    <h2 id="sec10">10) MIRROR IMAGE TO SECONDARY</h2>
+    <span class="description">Copies the current running OS to the backup partition for redundancy.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
         <span class="cmd">request system snapshot media internal slice alternate</span>
     </div>
 
-    <h2 id="sec11">11) BOOTLOADER U-BOOT / VELOADER UPGRADE</h2>
+    <h2 id="sec11">11) U-BOOT / VELOADER UPGRADE</h2>
+    <span class="description">Upgrading the low-level firmware responsible for the initial boot process.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Shell (%)</span>
-        <span class="cmd">bootupgrade -u /boot/uboot</span><br>
-        <span class="cmd">bootupgrade -l /boot/veloader -x</span>
+        <span class="cmd">bootupgrade -u /boot/uboot</span>
     </div>
-    <h3>11.1 Verify CRC</h3>
-    <div class="command-block"><span class="mode-label">Mode: Shell (%)</span><span class="cmd">bootupgrade -c u-boot</span></div>
 
-    <h2 id="sec12">12) BACKUP CONFIG TO USB (RESCUE CONFIG)</h2>
+    <h2 id="sec12">12) BACKUP CONFIG TO USB</h2>
+    <span class="description">Saves the current configuration as a rescue point and exports it to USB.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
         <span class="cmd">request system configuration rescue save</span>
-    </div>
-    <h3>12.2 Save Configuration</h3>
-    <div class="command-block">
-        <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show configuration | save /var/tmp/usb/msqsrx-usb.conf</span>
     </div>
 
     <h2 id="sec13">13) SRX345 INITIAL CONFIG</h2>
+    <span class="description">Standard baseline configuration for password, hostname, and SSH management.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Configuration (#)</span>
         <span class="cmd">set system root-authentication plain-text-password</span><br>
-        <span class="cmd">set system host-name srx</span><br>
-        <span class="cmd">set system services ssh</span><br>
-        <span class="cmd">set interfaces fxp0 unit 0 family inet address 192.168.0.178/24</span><br>
         <span class="cmd">commit</span>
     </div>
 
-    <h2 id="sec14">14) SOFTWARE UPGRADE FROM TFTP</h2>
+    <h2 id="sec14">14) SOFTWARE UPGRADE (TFTP)</h2>
+    <span class="description">Downloading and installing software via SCP/TFTP from a remote server.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Shell (%)</span>
-        <span class="cmd">scp carlos@192.168.0.102:/var/lib/tftpboot/junos-srxsme-21.2R1.10.tgz /var/tmp/</span>
+        <span class="cmd">scp user@host:/path/to/junos.tgz /var/tmp/</span>
     </div>
 
     <h2 id="sec15">15) POST-UPGRADE VERIFICATION</h2>
+    <span class="description">Comprehensive health checks for hardware, environment, and licenses.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show system information</span><br>
-        <span class="cmd">show chassis hardware detail</span><br>
-        <span class="cmd">show chassis environment</span><br>
-        <span class="cmd">show system license</span>
+        <span class="cmd">show chassis environment</span>
     </div>
 
     <h2 id="sec16">16) COMMON ALARMS & FIXES</h2>
+    <span class="description">Resolving standard "Auto-recovery" or "Rescue config" system alarms.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">request system auto recovery state save</span><br>
-        <span class="cmd">request system configuration rescue save</span>
+        <span class="cmd">request system auto recovery state save</span>
     </div>
 
-    <h2 id="sec17">17) ADDITIONAL VERIFICATION / TROUBLESHOOTING</h2>
+    <h2 id="sec17">17) VERIFICATION/TROUBLESHOOTING</h2>
+    <span class="description">Deep dive commands to check system processes and statistics.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show system processes</span><br>
-        <span class="cmd">show system statistics</span><br>
-        <span class="cmd">show system alarms detail</span>
+        <span class="cmd">show system processes</span>
     </div>
 
-    <h2 id="sec18">18) ADDITIONAL STORAGE / PARTITION COMMANDS</h2>
+    <h2 id="sec18">18) STORAGE & PARTITIONS</h2>
+    <span class="description">Checking disk space availability and file system health.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show system storage</span><br>
-        <span class="cmd">show system filesystems</span><br>
-        <span class="mode-label">Mode: Shell (%)</span>
-        <span class="cmd">df -h</span>
+        <span class="cmd">show system storage</span>
     </div>
 
-    <h2 id="sec19">19) ADDITIONAL BACKUP & RESTORE COMMANDS</h2>
+    <h2 id="sec19">19) BACKUP & RESTORE COMMANDS</h2>
+    <span class="description">Saving configuration to a local file and loading it back into the candidate config.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show configuration | save /var/tmp/backup.conf</span><br>
         <span class="cmd">load override /var/tmp/backup.conf</span>
     </div>
 
-    <h2 id="sec20">20) ADDITIONAL DEBUG / LOGS COMMANDS</h2>
+    <h2 id="sec20">20) DEBUG & LOGS</h2>
+    <span class="description">Viewing system messages and process logs to find errors.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show log messages | match ERROR</span><br>
-        <span class="cmd">show log chassisd | last 20</span><br>
-        <span class="cmd">show log interactive-commands | last 20</span>
+        <span class="cmd">show log messages | match ERROR</span>
     </div>
 
-    <h2 id="sec21">21) ADDITIONAL INTERFACE / ROUTING COMMANDS</h2>
+    <h2 id="sec21">21) INTERFACE & ROUTING</h2>
+    <span class="description">Checking physical port status, routing tables, and security policies.</span>
     <div class="command-block">
         <span class="mode-label">Mode: Operational (>)</span>
-        <span class="cmd">show interfaces extensive</span><br>
-        <span class="cmd">show route summary</span><br>
-        <span class="cmd">show security zones</span><br>
-        <span class="cmd">show security flow session</span>
+        <span class="cmd">show route summary</span>
+    </div>
+
+    <hr>
+
+    <h2 id="secA1">A1) CONFIG BACKUP TO INTERNAL STORAGE (CLI)</h2>
+    <span class="description">Saves the active configuration to a specific file in the /var/tmp directory for local staging.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">save /var/tmp/srx_backup.conf</span>
+    </div>
+
+    <h2 id="secA2">A2) USB MOUNTING VIA CLI (NO SHELL)</h2>
+    <span class="description">Safely mounts an inserted USB drive without needing to enter the FreeBSD shell mode.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">request system mount removable</span>
+    </div>
+
+    <h2 id="secA3">A3) VERIFY USB CONTENTS (CLI)</h2>
+    <span class="description">Lists all files present on the mounted USB drive to ensure the correct files are present.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">file list /mnt/usb</span>
+    </div>
+
+    <h2 id="secA4">A4) COPY CONFIGURATION TO USB</h2>
+    <span class="description">Moves the saved configuration file from internal storage to the external USB drive.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">file copy /var/tmp/srx_backup.conf /mnt/usb/</span>
+    </div>
+
+    <h2 id="secA5">A5) COPY CONFIGURATION FROM USB</h2>
+    <span class="description">Retrieves a backup configuration from the USB drive and places it in the local staging area.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">file copy /mnt/usb/srx_backup.conf /var/tmp/</span>
+    </div>
+
+    <h2 id="secA6">A6) ENTER CONFIGURATION MODE (EXPLICIT)</h2>
+    <span class="description">Enters the mode where system settings and parameters can be modified.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">configure</span>
+    </div>
+
+    <h2 id="secA7">A7) REVIEW CONFIGURATION CHANGES BEFORE COMMIT</h2>
+    <span class="description">Shows the difference between the running configuration and your new changes to prevent errors.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Configuration (#)</span>
+        <span class="cmd">show | compare</span>
+    </div>
+
+    <h2 id="secA8">A8) CLI-ONLY BACKUP & RESTORE WORKFLOW</h2>
+    <span class="description">A complete, safe sequence of commands to backup or restore settings without using shell access.</span>
+    <div class="command-block">
+        <span class="mode-label">Action: Backup</span><br>
+        <span class="cmd">request system configuration rescue save</span><br>
+        <span class="cmd">save /var/tmp/srx_backup.conf</span><br>
+        <span class="cmd">request system mount removable</span><br>
+        <span class="cmd">file copy /var/tmp/srx_backup.conf /mnt/usb/</span>
+    </div>
+    <div class="command-block">
+        <span class="mode-label">Action: Restore</span><br>
+        <span class="cmd">request system mount removable</span><br>
+        <span class="cmd">file copy /mnt/usb/srx_backup.conf /var/tmp/</span><br>
+        <span class="cmd">configure</span><br>
+        <span class="cmd">load override /var/tmp/srx_backup.conf</span><br>
+        <span class="cmd">show | compare</span><br>
+        <span class="cmd">commit and-quit</span>
+    </div>
+
+    <h2 id="secA9">A9) ADMIN-PC OFFLINE BACKUP STEP</h2>
+    <span class="description">External process: Move the USB to a PC and archive the .conf file for disaster recovery.</span>
+    <p><em>(Manual Process: No SRX commands required)</em></p>
+
+    <h2 id="secA10">A10) VERIFICATION ENHANCEMENTS ADDED</h2>
+    <span class="description">Displays granular details about storage usage and active system filesystems.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">show system storage detail</span><br>
+        <span class="cmd">show system filesystems</span>
+    </div>
+
+    <h2 id="secA11">A11) POST-RESTORE PERSISTENCE CHECK</h2>
+    <span class="description">Ensures that the newly restored configuration is saved as the system's official rescue point.</span>
+    <div class="command-block">
+        <span class="mode-label">Mode: Operational (>)</span>
+        <span class="cmd">request system configuration rescue save</span>
     </div>
 
     <hr>
